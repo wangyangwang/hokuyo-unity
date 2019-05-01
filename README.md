@@ -21,7 +21,7 @@ to better "converting a surface into a touch screen", I added the _distance crop
 there are two ways to constrain the detection area:
 
 - Rect
-![rect](https://github.com/wangyangwang/hokuyo-unity/blob/master/rect.png)
+![rect](https://github.com/wangyangwang/hokuyo-unity/blob/master/rect.PNG)
 - Radius
 ![rad](https://github.com/wangyangwang/hokuyo-unity/blob/master/rad.png)
 
