@@ -21,9 +21,9 @@ to better "converting a surface into a touch screen", I added the _distance crop
 there are two ways to constrain the detection area:
 
 - Rect
-![rect](rect.png)
+![rect](https://github.com/wangyangwang/hokuyo-unity/blob/master/rect.png)
 - Radius
-![rad](rad.PNG)
+![rad](https://github.com/wangyangwang/hokuyo-unity/blob/master/rad.png)
 
 if you choose `Rect` Mode, the sensor will only detect things within a rect area. You can change the _width_ and _height_ of the rect area by changing `detectRectWidth` and `detectRectHeight` the unit is *mm* (same as everything else!)
 
