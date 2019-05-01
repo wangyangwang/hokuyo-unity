@@ -221,31 +221,31 @@ public class URGSensorObjectDetector : MonoBehaviour
     private void OnGUI()
     {
         // https://sourceforge.net/p/urgnetwork/wiki/scip_jp/
-        if (GUILayout.Button("VV: (获取版本信息)"))
+        if (GUILayout.Button("VV: (Get Version Information)"))
         {
             urg.Write(SCIP_library.SCIP_Writer.VV());
         }
         //		if(GUILayout.Button("SCIP2")){
         //			urg.Write(SCIP_library.SCIP_Writer.SCIP2());
         //		}
-        if (GUILayout.Button("PP: (获取参数信息)"))
+        if (GUILayout.Button("PP: (Get Parameters)"))
         {
             urg.Write(SCIP_library.SCIP_Writer.PP());
         }
-        if (GUILayout.Button("MD: (测量和传输请求)"))
+        if (GUILayout.Button("MD: (Measure and Transimission)"))
         {
             urg.Write(SCIP_library.SCIP_Writer.MD(0, 1080, 1, 0, 0));
         }
-        if (GUILayout.Button("ME: (测量和距离数据·接收强度值传输请求)"))
+        if (GUILayout.Button("ME: (Measure Distance and Strength"))
         {
             urg.Write(SCIP_library.SCIP_Writer.ME(0, 1080, 1, 1, 0));
             open = true;
         }
-        if (GUILayout.Button("BM: (激光发射)"))
+        if (GUILayout.Button("BM: (Emit Laser)"))
         {
             urg.Write(SCIP_library.SCIP_Writer.BM());
         }
-        if (GUILayout.Button("GD: (测量距离数据传输请求)"))
+        if (GUILayout.Button("GD: (Measure Distance)"))
         {
             urg.Write(SCIP_library.SCIP_Writer.GD(0, 1080));
         }
