@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4575640681382976600
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4575640681382976582}
+  - component: {fileID: 4575640681382976601}
+  m_Layer: 0
+  m_Name: Sensor Data
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4575640681382976582
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4575640681382976600}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4575640681382976601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4575640681382976600}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 307b3ffa9488c41619dec48bc346675c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ip_address: 192.168.0.10
+  port_number: 10940
+  distanceCroppingMethod: 0
+  detectRectWidth: 1733
+  detectRectHeight: 926
+  maxDetectionDist: 1100
+  smoothDistanceCurve: 0
+  smoothDistanceByTime: 0
+  smoothKernelSize: 13
+  timeSmoothFactor: 0.08
+  deltaLimit: 50
+  noiseLimit: 10
+  debugDraw: 1
+  debugDrawDistance: 1
+  drawObjectRays: 1
+  drawObjectCenterRay: 1
+  drawObject: 1
+  distanceColor: {r: 1, g: 1, b: 1, a: 0.34509805}
+  strengthColor: {r: 1, g: 0.0956518, b: 0, a: 0.4862745}
+  objectColor: {r: 0, g: 1, b: 0, a: 1}

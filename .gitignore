@@ -1,0 +1,63 @@
+# =============== #
+# Unity generated #
+# =============== #
+Temp/
+[Oo]bj/
+UnityGenerated/
+Library/
+[Bb]uild/
+
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+ExportedObj/
+*.svd
+*.userprefs
+*.csproj
+*.pidb
+*.suo
+*.sln
+*.user
+*.unityproj
+*.booproj
+*.swp
+.vs
+
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+
+# ============ #
+# CUSTOM STUFF #
+# ============ #
+[Bb]uilds/
+temp/
+.vscode
+.vscoode/
+
+
+*.fbm
+*.fbm.meta
+
+# WWISE
+.cache/
+*AkWwiseProjectData*
+
+Assets/Models/HumanoidAnimations/idle/standing-idle.fbm.meta
+Assets/StreamingAssets/Audio/GeneratedSoundBanks/*DecodedBanks/English(US).meta
+Assets/StreamingAssets/Audio/GeneratedSoundBanks/*DecodedBanks.meta
+Assets/VSCode
+Assets/VSCode.meta
+
+# SublimeText Workspace File
+*.sublime-workspace
+*.sublime-workspace.meta
