@@ -23,7 +23,7 @@ there are two ways to constrain the detection area:
 - Rect
 ![rect](rect.png)
 - Radius
-![rad](rad.png)
+![rad](rad.PNG)
 
 if you choose `Rect` Mode, the sensor will only detect things within a rect area. You can change the _width_ and _height_ of the rect area by changing `detectRectWidth` and `detectRectHeight` the unit is *mm* (same as everything else!)
 
@@ -45,13 +45,16 @@ Files:
 ========
 
 
-- URGSensorObjectDetector
+- `URGSensorObjectDetector`
+
 this is the class for "detecting" object from sensor raw data
 
-- UrgDeviceEthernet
+- `UrgDeviceEthernet`
+
 This is where we get the raw data from the sensor
 
-- SCIP_library
+- `SCIP_library`
+
 Used by UrgDeviceEthernet, for low-level communication with the sensor
 
 
