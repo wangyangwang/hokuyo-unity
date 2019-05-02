@@ -179,9 +179,10 @@ public class URGSensorObjectDetector : MonoBehaviour
 
         for (int i = 0; i < detectedObjects.Count; i++)
         {
-            DetectObject obj = detectedObjects[i];
 
-            // Debug.LogFormat("median id: {0}, directions length {1}", obj.medianId, directions.Length);
+            DetectObject obj = detectedObjects[i];
+            if (obj.idList.Count == 0 || obj.distList.Count == 0) return;
+
             Vector3 dir = directions[obj.medianId];
             long dist = obj.medianDist;
 
@@ -292,7 +293,7 @@ public class URGSensorObjectDetector : MonoBehaviour
             smoothKernelSize += 1;
         }
 
-      
+
         List<long> originalDistances = new List<long>();
         lock (urg.distances)
         {
