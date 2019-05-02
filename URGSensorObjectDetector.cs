@@ -56,6 +56,7 @@ public class URGSensorObjectDetector : MonoBehaviour
     List<DetectObject> detectedObjects;
 
     [Header("Debug Draw")]
+
     public bool debugDraw = false;
     public bool debugDrawDistance = false;
     public bool drawObjectRays;
@@ -163,11 +164,8 @@ public class URGSensorObjectDetector : MonoBehaviour
     private void OnDrawGizmos()
     {
         //draw boundary
-        Gizmos.DrawWireSphere(new Vector3(0, 0, 0), maxDetectionDist);
-        Gizmos.DrawWireCube(new Vector3(0, detectRectHeight / 2, 0), new Vector3(detectAreaRect.width, detectAreaRect.height, 1));
-
-
-
+        Gizmos.DrawWireSphere(new Vector3(0, 0, 0) + transform.position, maxDetectionDist);
+        Gizmos.DrawWireCube(new Vector3(0, detectRectHeight / 2, 0) + transform.position, new Vector3(detectAreaRect.width, detectAreaRect.height, 1));
 
         //draw distance rays
         if (debugDrawDistance && croppedDistances != null)
@@ -176,7 +174,7 @@ public class URGSensorObjectDetector : MonoBehaviour
             {
                 Vector3 dir = directions[i];
                 long dist = croppedDistances[i];
-                Debug.DrawRay(Vector3.zero, dist * dir, distanceColor);
+                Debug.DrawLine(Vector3.zero + transform.position, (dist * dir) + transform.position, distanceColor);
             }
         }
 
@@ -197,23 +195,19 @@ public class URGSensorObjectDetector : MonoBehaviour
                 for (int j = 0; j < obj.distList.Count; j++)
                 {
                     var myDir = directions[obj.idList[j]];
-                    Debug.DrawLine(Vector2.zero, myDir * obj.distList[j], objectColor);
+                    Debug.DrawLine(Vector3.zero + transform.position, (myDir * obj.distList[j]) + transform.position, objectColor);
                 }
             }
 
 
             //center
-            if (drawObjectCenterRay) Debug.DrawLine(Vector2.zero, dir * dist, Color.blue);
+            if (drawObjectCenterRay) Debug.DrawLine(Vector3.zero + transform.position, (dir * dist) + transform.position, Color.blue);
 
 
             //draw objects!
-            if (drawObject) Gizmos.DrawWireCube(obj.GetPosition(directions), new Vector3(100, 100));
+            if (drawObject) Gizmos.DrawWireCube((Vector3)obj.GetPosition(directions) + transform.position, new Vector3(100, 100, 0));
 
         }
-
-
-
-
     }
 #endif
 
@@ -353,10 +347,6 @@ public class URGSensorObjectDetector : MonoBehaviour
 
         DetectObjects(croppedDistances, distanceConstrainList, ref detectedObjects);
 
-
-
-
-
     }
 
     private List<long> SmoothDistanceCurve(List<long> croppedDistances, int smoothKernelSize)
@@ -451,7 +441,7 @@ public class URGSensorObjectDetector : MonoBehaviour
     }
 
 
-    [System.Serializable]
+    [Serializable]
     private class DetectObject
     {
         public List<long> distList;
