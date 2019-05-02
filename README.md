@@ -8,6 +8,8 @@ this is modified based on https://github.com/inoook/UnityURG
 improvments and contributions are very welcomed.
 
 
+this library works with multiple Hokuyo sensors, you need to give each of them a unique IP.
+
 why
 =====
 
