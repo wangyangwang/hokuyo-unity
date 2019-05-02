@@ -16,155 +16,174 @@ using SCIP_library;
 
 public class UrgDeviceEthernet : UrgDevice
 {
-//	private Thread listenThread;
-	private Thread clientThread;
-	TcpClient tcpClient;
-	
-	public List<long> distances;
-	public List<long> strengths;
+    //	private Thread listenThread;
+    private Thread clientThread;
+    TcpClient tcpClient;
 
-//	private Queue messageQueue;
-	
-	private string ip_address = "192.168.0.10";
-	private int port_number = 10940;
+    public List<long> distances;
+    public List<long> strengths;
 
-	public void StartTCP(string ip = "192.168.0.10", int port = 10940)
+    //	private Queue messageQueue;
+
+    private string ip_address = "192.168.0.10";
+    private int port_number = 10940;
+
+    public void StartTCP(string ip = "192.168.0.10", int port = 10940)
     {
-//		messageQueue = Queue.Synchronized(new Queue());
+        //		messageQueue = Queue.Synchronized(new Queue());
 
-		ip_address = ip;
-		port_number = port;
+        ip_address = ip;
+        port_number = port;
 
-		distances = new List<long>();
-		strengths = new List<long>();
+        distances = new List<long>();
+        strengths = new List<long>();
 
-        try {
+        try
+        {
             tcpClient = new TcpClient();
             tcpClient.Connect(ip_address, port_number);
-			
-			Debug.Log("Connect setting = IP Address : " + ip_address + " Port number : " + port_number.ToString());
-            
-//			this.listenThread = new Thread(new ThreadStart(ListenForClients));
-//			this.listenThread.Start();
 
-			ListenForClients();
-        } catch (Exception ex) {
+            Debug.Log("Connect setting = IP Address : " + ip_address + " Port number : " + port_number.ToString());
+
+            //			this.listenThread = new Thread(new ThreadStart(ListenForClients));
+            //			this.listenThread.Start();
+
+            ListenForClients();
+        }
+        catch (Exception ex)
+        {
             Debug.Log(ex.Message);
-        } finally {
+        }
+        finally
+        {
 
         }
     }
 
-	void OnDisable()
-	{
-		DeInit();
-	}
-	void OnApplicationQuit()
-	{
-		DeInit();
-	}
-	
-	void DeInit()
-	{
-		if(tcpClient != null){
-			if( tcpClient.Connected ){
-				NetworkStream stream = tcpClient.GetStream();
-				if(stream != null){
-					stream.Close();
-				}
-			}
-			tcpClient.Close();
-		}
-		
-		if(this.clientThread != null){
-			this.clientThread.Abort();
-		}
-	}
+    void OnDisable()
+    {
+        DeInit();
+    }
+    void OnApplicationQuit()
+    {
+        DeInit();
+    }
 
-	public void Write(string scip)
-	{
-		NetworkStream stream = tcpClient.GetStream();
-		write(stream, scip);
-	}
+    void DeInit()
+    {
+        if (tcpClient != null)
+        {
+            if (tcpClient.Connected)
+            {
+                NetworkStream stream = tcpClient.GetStream();
+                if (stream != null)
+                {
+                    stream.Close();
+                }
+            }
+            tcpClient.Close();
+        }
 
-	private void ListenForClients()
-	{
-		clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
-		clientThread.Start(tcpClient);
-	}
-	private void HandleClientComm(object obj)
-	{
-		try
-		{
-			using (TcpClient client = (TcpClient)obj)
-			{
-				using (NetworkStream stream = client.GetStream())
-				{
-//					NetworkStream clientStream = client.GetStream();
-					while (true)
-					{
-						long time_stamp = 0;
-						string receive_data = read_line(stream);
-//						messageQueue.Enqueue( receive_data );
+        if (this.clientThread != null)
+        {
+            this.clientThread.Abort();
+        }
+    }
 
-						string cmd = GetCommand(receive_data);
-						if(cmd == GetCMDString(CMD.MD)){
-                            //measure distance only
-							distances.Clear();
-							SCIP_Reader.MD(receive_data, ref time_stamp, ref distances);
-						}else if(cmd == GetCMDString(CMD.ME)){
-                            //measure distance and strength
-							distances.Clear();
-							strengths.Clear();
-							SCIP_Reader.ME(receive_data, ref time_stamp, ref distances, ref strengths);
-						}else{
-							Debug.Log(">>"+receive_data);
-						}
-					}
-//					client.Close();
-				}
-			}
-		} catch (System.Exception ex) {
-			Debug.LogWarning("error: "+ex);
-		}
-	}
+    public void Write(string scip)
+    {
+        NetworkStream stream = tcpClient.GetStream();
+        write(stream, scip);
+    }
 
-	string GetCommand(string get_command)
-	{
-		string[] split_command = get_command.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-		return split_command[0].Substring(0, 2);
-	}
-	
-	bool CheckCommand(string get_command, string cmd)
-	{
-		string[] split_command = get_command.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-		return split_command[0].StartsWith(cmd);
-	}
+    private void ListenForClients()
+    {
+        clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
+        clientThread.Start(tcpClient);
+    }
+    private void HandleClientComm(object obj)
+    {
+        try
+        {
+            using (TcpClient client = (TcpClient)obj)
+            {
+                using (NetworkStream stream = client.GetStream())
+                {
+                    //					NetworkStream clientStream = client.GetStream();
+                    while (true)
+                    {
+                        long time_stamp = 0;
+                        string receive_data = read_line(stream);
+                        //						messageQueue.Enqueue( receive_data );
 
-//	void Update()
-//	{
-//		lock(messageQueue.SyncRoot){
-//			if(messageQueue.Count > 0){
-//				string receive_data = messageQueue.Dequeue().ToString();
-//				long time_stamp;
-//				if(CheckCommand(receive_data, "MD")){
-//					distances.Clear();
-//					time_stamp = 0;
-//
-//					SCIP_Reader.MD(receive_data, ref time_stamp, ref distances);
-//					//Debug.Log("time stamp: " + time_stamp.ToString() + " / count: "+distances.Count);
-//				}else if(CheckCommand(receive_data, "GD")){
-//					distances.Clear();
-//					time_stamp = 0;
-//
-//					SCIP_Reader.GD(receive_data, ref time_stamp, ref distances);
-//				}else{
-//					Debug.Log(">>"+receive_data);
-//				}
-//			}
-//		}
-//		
-//	}
+                        string cmd = GetCommand(receive_data);
+                        lock (distances)
+                        {
+                            if (cmd == GetCMDString(CMD.MD))
+                            {
+                                //measure distance only
+                                distances.Clear();
+                                SCIP_Reader.MD(receive_data, ref time_stamp, ref distances);
+                            }
+                            else if (cmd == GetCMDString(CMD.ME))
+                            {
+                                //measure distance and strength
+                                distances.Clear();
+                                strengths.Clear();
+                                SCIP_Reader.ME(receive_data, ref time_stamp, ref distances, ref strengths);
+                            }
+                            else
+                            {
+                                Debug.Log(">>" + receive_data);
+                            }
+                        }
+                    }
+                    //					client.Close();
+                }
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning("error: " + ex);
+        }
+    }
+
+    string GetCommand(string get_command)
+    {
+        string[] split_command = get_command.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        return split_command[0].Substring(0, 2);
+    }
+
+    bool CheckCommand(string get_command, string cmd)
+    {
+        string[] split_command = get_command.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        return split_command[0].StartsWith(cmd);
+    }
+
+    //	void Update()
+    //	{
+    //		lock(messageQueue.SyncRoot){
+    //			if(messageQueue.Count > 0){
+    //				string receive_data = messageQueue.Dequeue().ToString();
+    //				long time_stamp;
+    //				if(CheckCommand(receive_data, "MD")){
+    //					distances.Clear();
+    //					time_stamp = 0;
+    //
+    //					SCIP_Reader.MD(receive_data, ref time_stamp, ref distances);
+    //					//Debug.Log("time stamp: " + time_stamp.ToString() + " / count: "+distances.Count);
+    //				}else if(CheckCommand(receive_data, "GD")){
+    //					distances.Clear();
+    //					time_stamp = 0;
+    //
+    //					SCIP_Reader.GD(receive_data, ref time_stamp, ref distances);
+    //				}else{
+    //					Debug.Log(">>"+receive_data);
+    //				}
+    //			}
+    //		}
+    //		
+    //	}
 
 
     /// <summary>
@@ -173,26 +192,36 @@ public class UrgDeviceEthernet : UrgDevice
     /// <returns>receive data</returns>
     static string read_line(NetworkStream stream)
     {
-        if (stream.CanRead) {
+        if (stream.CanRead)
+        {
             StringBuilder sb = new StringBuilder();
             bool is_NL2 = false;
             bool is_NL = false;
-            do {
+            do
+            {
                 char buf = (char)stream.ReadByte();
-                if (buf == '\n') {
-                    if (is_NL) {
+                if (buf == '\n')
+                {
+                    if (is_NL)
+                    {
                         is_NL2 = true;
-                    } else {
+                    }
+                    else
+                    {
                         is_NL = true;
                     }
-                } else {
+                }
+                else
+                {
                     is_NL = false;
                 }
                 sb.Append(buf);
             } while (!is_NL2);
 
             return sb.ToString();
-        } else {
+        }
+        else
+        {
             return null;
         }
     }
@@ -202,11 +231,14 @@ public class UrgDeviceEthernet : UrgDevice
     /// </summary>
     static bool write(NetworkStream stream, string data)
     {
-        if (stream.CanWrite) {
+        if (stream.CanWrite)
+        {
             byte[] buffer = Encoding.ASCII.GetBytes(data);
             stream.Write(buffer, 0, buffer.Length);
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }

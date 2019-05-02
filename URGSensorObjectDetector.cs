@@ -9,9 +9,6 @@ using UnityEngine;
 public class URGSensorObjectDetector : MonoBehaviour
 {
 
-
-    public static URGSensorObjectDetector Instance = null;
-
     [Header("Connection with Sensor")]
 
     public string ip_address = "192.168.0.10";
@@ -74,8 +71,6 @@ public class URGSensorObjectDetector : MonoBehaviour
     List<long> strengths;
     Vector3[] directions;
     bool directionCached = false;
-    int drawCount;
-
 
     public enum DistanceCroppingMethod
     {
@@ -186,6 +181,7 @@ public class URGSensorObjectDetector : MonoBehaviour
         {
             DetectObject obj = detectedObjects[i];
 
+            // Debug.LogFormat("median id: {0}, directions length {1}", obj.medianId, directions.Length);
             Vector3 dir = directions[obj.medianId];
             long dist = obj.medianDist;
 
@@ -257,14 +253,6 @@ public class URGSensorObjectDetector : MonoBehaviour
         // GUILayout.Label("drawCount: " + drawCount + " / detectObjects: " + detectedObjects.Count);
     }
 
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-    }
     // Use this for initialization
     private void Start()
     {
@@ -304,12 +292,16 @@ public class URGSensorObjectDetector : MonoBehaviour
             smoothKernelSize += 1;
         }
 
-        List<long> originalDistances = new List<long>(urg.distances);
-
-        if (originalDistances.Count <= 0)
+      
+        List<long> originalDistances = new List<long>();
+        lock (urg.distances)
         {
-            return;
+            if (urg.distances.Count <= 0) return;
+            originalDistances = new List<long>(urg.distances);
         }
+        if (originalDistances.Count <= 0) return;
+
+
 
 
         //Setting up things, one time
