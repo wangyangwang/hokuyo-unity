@@ -202,7 +202,7 @@ public class URGSensorObjectDetector : MonoBehaviour
 
 
             //draw objects!
-            if (drawObject) Gizmos.DrawWireCube((Vector3)obj.GetPosition(directions) + transform.position, new Vector3(100, 100, 0));
+            if (drawObject) Gizmos.DrawWireCube((Vector3)obj.GetSmoothedPosition() + transform.position, new Vector3(100, 100, 0));
 
         }
     }
@@ -350,6 +350,11 @@ public class URGSensorObjectDetector : MonoBehaviour
 
     private void DetectObjects(List<long> croppedDistances, long[] distanceConstrainList, ref List<DetectObject> resultList, bool useCV = true)
     {
+        if (directions.Length <= 0)
+        {
+            Debug.LogError("directions array is not setup.");
+            return;
+        }
 
         if (resultList == null)
             resultList = new List<DetectObject>();
@@ -369,7 +374,7 @@ public class URGSensorObjectDetector : MonoBehaviour
                 if (!isGrouping)
                 {
                     isGrouping = true;
-                    DetectObject newObject = new DetectObject();
+                    DetectObject newObject = new DetectObject(directions);
                     newObject.startDist = i;
                     detectedObjects.Add(newObject);
                     isGrouping = true;
@@ -475,10 +480,16 @@ public class URGSensorObjectDetector : MonoBehaviour
                 return distList[size / 2];
             }
         }
+        public float smoothTime = 0.3f;
+
+        private Vector3[] cachedDirs;
+        //private Vector2 oldPosition = Vector2.zero;
+        //private Vector2 smoothedPosition = Vector2.zero;
+        private Vector2 currentPosition = Vector2.zero;
+        private Vector2 velocityForSmooth = new Vector2();
 
 
-
-        public Vector2 GetPosition(in Vector3[] cachedDirs)
+        public Vector2 GetRawPosition()
         {
             float angle = Vector3.Angle(cachedDirs[averageId], Vector3.right);
             float theta = angle * Mathf.Deg2Rad;
@@ -487,11 +498,20 @@ public class URGSensorObjectDetector : MonoBehaviour
             return new Vector2(x, y);
         }
 
+        public Vector2 GetSmoothedPosition()
+        {
+            var result = Vector2.SmoothDamp(currentPosition, GetRawPosition(), ref velocityForSmooth, smoothTime);
+            currentPosition = result;
+            return result;
+        }
 
-        public DetectObject()
+
+        public DetectObject(in Vector3[] cachedDirs)
         {
             distList = new List<long>();
             idList = new List<int>();
+            //save cached direction data
+            this.cachedDirs = cachedDirs;
         }
     }
     // PP
