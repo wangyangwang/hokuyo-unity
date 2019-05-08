@@ -39,36 +39,33 @@ namespace HKY
         public long maxDetectionDist = 7000;//for radius based detection, unit is mm
 
         [Header("Post Processing Distance Data")]
-        public bool smoothDistanceCurve;
-        public bool smoothDistanceByTime;
+        public bool smoothDistanceCurve = false;
+        public bool smoothDistanceByTime = false;
         [Range(1, 130)] public int smoothKernelSize = 21;
         List<long> smoothByTimePreviousList = new List<long>();
         [Range(0.01f, 1f)] public float timeSmoothFactor;
 
         [Header("Object Detection")]
         [Range(1, 40)] public int noiseLimit = 7;
-        List<Vector3> detectedDir;
-        List<float> detectedDis;
+        [Range(10, 1000)] public int deltaLimit = 200;
         List<RawObject> rawObjectList;
 
+        //Object Tracking
+        public List<ProcessedObject> detectedObjects { get; private set; }
         [Header("Object Tracking")]
-        /// <summary>
-        /// after object tracking, ProcessedObject exist across frames
-        /// </summary>
-        public List<ProcessedObject> detectedObjects;
         public float distanceThresholdForMerge = 300;
 
+        //Events
         public static System.Action<Guid> OnNewObject;
         public static System.Action<Guid> OnLoseObject;
 
         [Header("Debug Draw")]
         public bool debugDrawDistance = false;
-        public bool drawObjectRays;
-        public bool drawObjectCenterRay;
-        public bool drawObject;
-        public bool drawProcessedObject;
-        public bool drawRunningLine;
-
+        public bool drawObjectRays = true;
+        public bool drawObjectCenterRay = true;
+        public bool drawObject = true;
+        public bool drawProcessedObject = true;
+        public bool drawRunningLine = true;
         //colors
         public Color distanceColor = Color.white;
         public Color strengthColor = Color.red;
@@ -279,8 +276,6 @@ namespace HKY
         {
             croppedDistances = new List<long>();
             strengths = new List<long>();
-            detectedDis = new List<float>();
-            detectedDir = new List<Vector3>();
             detectedObjects = new List<ProcessedObject>();
 
             urg = gameObject.AddComponent<UrgDeviceEthernet>();
@@ -380,24 +375,31 @@ namespace HKY
 
             var resultList = new List<RawObject>();
             bool isGrouping = false;
-            for (int i = 0; i < croppedDistances.Count; i++)
+            for (int i = 1; i < croppedDistances.Count - 1; i++)
             {
+
+                float deltaA = Mathf.Abs(croppedDistances[i] - croppedDistances[i - 1]);
+                float deltaB = Mathf.Abs(croppedDistances[i + 1] - croppedDistances[i]);
 
                 var dist = croppedDistances[i];
                 var ubDist = distanceConstrainList[i];
 
-                if (dist < ubDist - 5)
+                //
+                if (dist < ubDist && (deltaA < deltaLimit && deltaB < deltaLimit))
                 {
                     if (!isGrouping)
                     {
+                        //is not grouping
                         isGrouping = true;
+                        //start a new object and start grouping
                         RawObject newObject = new RawObject(directions, objectId++);
+                        newObject.idList.Add(i);
+                        newObject.distList.Add(dist);
                         resultList.Add(newObject);
-
-                        isGrouping = true;
                     }
                     else
                     {
+                        //already grouping, add stuff to existing group
                         var newObject = resultList[resultList.Count - 1];
                         newObject.idList.Add(i);
                         newObject.distList.Add(dist);
