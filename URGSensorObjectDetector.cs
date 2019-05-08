@@ -419,36 +419,28 @@ namespace HKY
                         float distance = Vector3.Distance(newObj.CalculatePosition(), oldObj.position);
                         objectByDistance.Add(newObj, distance);
                     }
-                    //make a new list that has all the close new object
-                    List<RawObject> mergeList = new List<RawObject>();
-                    foreach (var pair in objectByDistance)
-                    {
-                        if (pair.Value <= distanceThresholdForMerge)
-                        {
-                            mergeList.Add(pair.Key);
-                        }
-                    }
-
-                    //update oldObj position
-                    if (mergeList.Count != 0) //has close object , update 
-                    {
-                        //TODO: use the closet instead of a average.
-                        //  update current object
-                        Vector3 positionSum = Vector3.zero;
-                        foreach (var e in mergeList)
-                        {
-                            positionSum += (Vector3)e.CalculatePosition();
-                            //remove new object that has been used/dealt
-                            newObjects.Remove(e);
-                        }
-
-                        oldObj.Update(positionSum / mergeList.Count);
-
-                    }
-                    else //doesn't find close object, start waiting timer
+    
+                    if (objectByDistance.Count <= 0)
                     {
                         oldObj.Update();
                     }
+                    else
+                    {
+                        //find the closest new obj and check if the dist is smaller than distanceThresholdForMerge, if yes, then update oldObj's position to this newObj
+                        var closest = objectByDistance.Aggregate((l, r) => l.Value < r.Value ? l : r);
+                        if (closest.Value <= distanceThresholdForMerge)
+                        {
+                            oldObj.Update(closest.Key.CalculatePosition());
+                            //remove the newObj that is being used
+                            newObjects.Remove(closest.Key);
+                        }
+                        else
+                        {
+                            //this oldObj cannot find a new one that is close enough to it
+                            oldObj.Update();
+                        }
+                    }
+
                 }
 
                 //remove all missed objects
@@ -459,9 +451,9 @@ namespace HKY
                     {
                         if (OnLoseObject != null) { OnLoseObject(obj.guid); }
                         detectedObjects.RemoveAt(i);
+                        Debug.Log("removed object " + obj.guid);
                     }
                 }
-
 
                 //create new object for those newobject that cannot find match from the old objects
                 foreach (var leftOverNewObject in newObjects)

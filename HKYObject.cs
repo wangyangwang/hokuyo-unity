@@ -39,7 +39,7 @@ namespace HKY
     public class ProcessedObject
     {
 
-        static readonly int MISSING_FRAME_LIMIT = 20;
+        static readonly int MISSING_FRAME_LIMIT = 5;
 
         public readonly System.Guid guid;
         public Vector3 position { get; private set; }
