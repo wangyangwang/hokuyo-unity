@@ -71,4 +71,4 @@ Attach _URGSensorObjectDetector_ to an empty GameObject or use the Prefab _Senso
 Warning
 ===
 
-*I only have one 	**Hokuyo UST-10LX**  so obviously this code is not tested on any other Hokuyo sensors... but it shoudl work with most of them!*
+*I only have two 	**Hokuyo UST-10LX**  so obviously this code is not tested on any other Hokuyo sensor model... but it should work with most of them!*
