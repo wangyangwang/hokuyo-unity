@@ -419,7 +419,7 @@ namespace HKY
                         float distance = Vector3.Distance(newObj.CalculatePosition(), oldObj.position);
                         objectByDistance.Add(newObj, distance);
                     }
-    
+
                     if (objectByDistance.Count <= 0)
                     {
                         oldObj.Update();
@@ -451,7 +451,6 @@ namespace HKY
                     {
                         if (OnLoseObject != null) { OnLoseObject(obj.guid); }
                         detectedObjects.RemoveAt(i);
-                        Debug.Log("removed object " + obj.guid);
                     }
                 }
 
