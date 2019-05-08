@@ -84,6 +84,20 @@ namespace HKY
             RECT, RADIUS
         }
 
+        public ProcessedObject GetObjectByGuid(Guid guid)
+        {
+            ProcessedObject o = null;
+            foreach (var obj in detectedObjects)
+            {
+                if (obj.guid == guid)
+                {
+                    o = obj;
+                }
+            }
+            if (o == null) Debug.LogWarning("cannot find object with guid " + guid);
+            return o;
+        }
+
         void CalculateDistanceConstrainList(int steps)
         {
             switch (distanceCroppingMethod)
