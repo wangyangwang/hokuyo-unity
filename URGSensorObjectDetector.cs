@@ -41,6 +41,8 @@ namespace HKY
         [Header("Post Processing Distance Data")]
         public bool smoothDistanceCurve = false;
         public bool smoothDistanceByTime = false;
+        //if change between two consecutive frame is bigger than this number, then do not do smoothing
+        [Range(1, 500)] public int timeSmoothBreakingDistanceChange = 200;
         [Range(1, 130)] public int smoothKernelSize = 21;
         List<long> smoothByTimePreviousList = new List<long>();
         [Range(0.01f, 1f)] public float timeSmoothFactor;
@@ -425,74 +427,77 @@ namespace HKY
             List<HKY.RawObject> newObjects = DetectObjects(croppedDistances, distanceConstrainList);
             rawObjectList = new List<RawObject>(newObjects);
 
-            //update existing objects
-            if (detectedObjects.Count != 0)
+            lock (detectedObjects)
             {
-                foreach (var oldObj in detectedObjects)
+                //update existing objects
+                if (detectedObjects.Count != 0)
                 {
-                    Dictionary<RawObject, float> objectByDistance = new Dictionary<RawObject, float>();
-                    //calculate all distance between existing objects and newly found objects
-                    foreach (var newObj in newObjects)
+                    foreach (var oldObj in detectedObjects)
                     {
-                        float distance = Vector3.Distance(newObj.CalculatePosition(), oldObj.position);
-                        objectByDistance.Add(newObj, distance);
-                    }
-
-                    if (objectByDistance.Count <= 0)
-                    {
-                        oldObj.Update();
-                    }
-                    else
-                    {
-                        //find the closest new obj and check if the dist is smaller than distanceThresholdForMerge, if yes, then update oldObj's position to this newObj
-                        var closest = objectByDistance.Aggregate((l, r) => l.Value < r.Value ? l : r);
-                        if (closest.Value <= distanceThresholdForMerge)
+                        Dictionary<RawObject, float> objectByDistance = new Dictionary<RawObject, float>();
+                        //calculate all distance between existing objects and newly found objects
+                        foreach (var newObj in newObjects)
                         {
-                            oldObj.Update(closest.Key.CalculatePosition());
-                            //remove the newObj that is being used
-                            newObjects.Remove(closest.Key);
+                            float distance = Vector3.Distance(newObj.CalculatePosition(), oldObj.position);
+                            objectByDistance.Add(newObj, distance);
+                        }
+
+                        if (objectByDistance.Count <= 0)
+                        {
+                            oldObj.Update();
                         }
                         else
                         {
-                            //this oldObj cannot find a new one that is close enough to it
-                            oldObj.Update();
+                            //find the closest new obj and check if the dist is smaller than distanceThresholdForMerge, if yes, then update oldObj's position to this newObj
+                            var closest = objectByDistance.Aggregate((l, r) => l.Value < r.Value ? l : r);
+                            if (closest.Value <= distanceThresholdForMerge)
+                            {
+                                oldObj.Update(closest.Key.CalculatePosition());
+                                //remove the newObj that is being used
+                                newObjects.Remove(closest.Key);
+                            }
+                            else
+                            {
+                                //this oldObj cannot find a new one that is close enough to it
+                                oldObj.Update();
+                            }
+                        }
+
+                    }
+
+                    //remove all missed objects
+                    for (int i = 0; i < detectedObjects.Count; i++)
+                    {
+                        var obj = detectedObjects[i];
+                        if (obj.clear)
+                        {
+                            if (OnLoseObject != null) { OnLoseObject(obj.guid); }
+                            detectedObjects.RemoveAt(i);
                         }
                     }
 
-                }
-
-                //remove all missed objects
-                for (int i = 0; i < detectedObjects.Count; i++)
-                {
-                    var obj = detectedObjects[i];
-                    if (obj.clear)
+                    //create new object for those newobject that cannot find match from the old objects
+                    foreach (var leftOverNewObject in newObjects)
                     {
-                        if (OnLoseObject != null) { OnLoseObject(obj.guid); }
-                        detectedObjects.RemoveAt(i);
+                        var newbie = new ProcessedObject(leftOverNewObject.CalculatePosition());
+                        detectedObjects.Add(newbie);
+                        if (OnNewObject != null)
+                        {
+                            OnNewObject(newbie.guid);
+                        }
                     }
                 }
-
-                //create new object for those newobject that cannot find match from the old objects
-                foreach (var leftOverNewObject in newObjects)
+                else //add all raw objects into detectedObjects
                 {
-                    var newbie = new ProcessedObject(leftOverNewObject.CalculatePosition());
-                    detectedObjects.Add(newbie);
-                    if (OnNewObject != null)
+                    foreach (var obj in rawObjectList)
                     {
-                        OnNewObject(newbie.guid);
+                        var newbie = new ProcessedObject(obj.CalculatePosition());
+                        detectedObjects.Add(newbie);
+                        // if (OnNewObject != null)
+                        // {
+                        //     OnNewObject(newbie.guid);
+                        // }
                     }
-                }
-            }
-            else //add all raw objects into detectedObjects
-            {
-                foreach (var obj in rawObjectList)
-                {
-                    var newbie = new ProcessedObject(obj.CalculatePosition());
-                    detectedObjects.Add(newbie);
-                    // if (OnNewObject != null)
-                    // {
-                    //     OnNewObject(newbie.guid);
-                    // }
                 }
             }
         }
@@ -513,11 +518,19 @@ namespace HKY
                 {
 
                     float diff = newList[i] - previousList[i];
-                    float smallDiff = diff * smoothFactor;
-                    float final = previousList[i] + smallDiff;
+                    if (diff > timeSmoothBreakingDistanceChange)
+                    {
+                        result[i] = newList[i];
+                        previousList[i] = result[i];
+                    }
+                    else
+                    {
+                        float smallDiff = diff * smoothFactor;
+                        float final = previousList[i] + smallDiff;
 
-                    result[i] = (long)final;
-                    previousList[i] = result[i];
+                        result[i] = (long)final;
+                        previousList[i] = result[i];
+                    }
                 }
                 return result.ToList();
             }
