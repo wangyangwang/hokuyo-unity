@@ -67,6 +67,7 @@ namespace HKY
         public bool drawObjectCenterRay;
         public bool drawObject;
         public bool drawProcessedObject;
+        public bool drawRunningLine;
 
         //colors
         public Color distanceColor = Color.white;
@@ -91,7 +92,14 @@ namespace HKY
                 case DistanceCroppingMethod.RADIUS:
                     for (int i = 0; i < steps; i++)
                     {
-                        distanceConstrainList[i] = maxDetectionDist;
+                        if (directions[i].y < 0)
+                        {
+                            distanceConstrainList[i] = 0;
+                        }
+                        else
+                        {
+                            distanceConstrainList[i] = maxDetectionDist;
+                        }
                     }
                     break;
 
@@ -131,8 +139,6 @@ namespace HKY
                             }
 
                             distanceConstrainList[i] = (long)r;
-
-
                         }
 
 
@@ -207,6 +213,16 @@ namespace HKY
                 {
                     Gizmos.color = processedObjectColor;
                     Gizmos.DrawCube(pObj.position, new Vector3(pObj.width, pObj.width, 1));
+                }
+            }
+
+
+
+            if (drawRunningLine)
+            {
+                for (int i = 1; i < croppedDistances.Count; i++)
+                {
+                    Gizmos.DrawLine(new Vector3(i, detectRectHeight + croppedDistances[i], 0), new Vector3(i - 1, detectRectHeight + croppedDistances[i - 1], 0));
                 }
             }
         }
@@ -348,8 +364,8 @@ namespace HKY
 
         private List<long> SmoothDistanceCurve(List<long> croppedDistances, int smoothKernelSize)
         {
-            //TODO:
-            return croppedDistances;
+            HKY.MovingAverage movingAverageFilter = new MovingAverage();
+            return movingAverageFilter.Filter(croppedDistances.ToArray(), smoothKernelSize).ToList();
         }
 
         private List<RawObject> DetectObjects(List<long> croppedDistances, long[] distanceConstrainList)
@@ -370,7 +386,7 @@ namespace HKY
                 var dist = croppedDistances[i];
                 var ubDist = distanceConstrainList[i];
 
-                if (dist < ubDist - 20)
+                if (dist < ubDist - 5)
                 {
                     if (!isGrouping)
                     {

@@ -19,10 +19,10 @@ namespace HKY
 
         public Vector2 CalculatePosition()
         {
-            float angle = Vector3.Angle(cachedDirs[averageId], Vector3.right);
+            float angle = Vector3.Angle(cachedDirs[medianId], Vector3.right);
             float theta = angle * Mathf.Deg2Rad;
-            float x = Mathf.Cos(theta) * (float)averageDist;
-            float y = Mathf.Sin(theta) * (float)averageDist;
+            float x = Mathf.Cos(theta) * (float)medianDist;
+            float y = Mathf.Sin(theta) * (float)medianDist;
             return new Vector2(x, y);
         }
 
@@ -39,7 +39,7 @@ namespace HKY
     public class ProcessedObject
     {
 
-        static readonly int MISSING_FRAME_LIMIT = 5;
+        static readonly int MISSING_FRAME_LIMIT = 10;
 
         public readonly System.Guid guid;
         public Vector3 position { get; private set; }
@@ -51,7 +51,7 @@ namespace HKY
         public bool useSmooth = true;
 
         Vector3 currentVelocity;
-        public float smoothTime = 0.2f;
+        public float smoothTime = 0.3f;
 
         public ProcessedObject(Vector3 position, float width = 100)
         {
