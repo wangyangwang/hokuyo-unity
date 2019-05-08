@@ -48,11 +48,18 @@ namespace HKY
         public int missingFrame = 0;
         public bool clear { get; private set; }
 
+        public bool useSmooth = true;
+
+        Vector3 currentVelocity;
+        public float smoothTime = 0.2f;
+
         public ProcessedObject(Vector3 position, float width = 100)
         {
             guid = System.Guid.NewGuid();
             this.position = position;
             this.width = width;
+
+            currentVelocity = new Vector3();
 
             // birthTime = Time.time;
         }
@@ -60,7 +67,15 @@ namespace HKY
         //update with a new position
         public void Update(Vector3 newPos)
         {
-            position = newPos;
+            if (useSmooth)
+            {
+                position = Vector3.SmoothDamp(position, newPos, ref currentVelocity, smoothTime);
+            }
+            else
+            {
+                position = newPos;
+            }
+
             missingFrame = 0;
         }
         //update without a new position

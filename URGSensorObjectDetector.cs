@@ -432,7 +432,8 @@ namespace HKY
                     //update oldObj position
                     if (mergeList.Count != 0) //has close object , update 
                     {
-                        //update current object
+                        //TODO: use the closet instead of a average.
+                        //  update current object
                         Vector3 positionSum = Vector3.zero;
                         foreach (var e in mergeList)
                         {
@@ -442,6 +443,7 @@ namespace HKY
                         }
 
                         oldObj.Update(positionSum / mergeList.Count);
+
                     }
                     else //doesn't find close object, start waiting timer
                     {
