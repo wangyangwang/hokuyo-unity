@@ -53,7 +53,7 @@ namespace HKY
         List<RawObject> rawObjectList;
 
         //Object Tracking
-        public List<ProcessedObject> detectedObjects { get; private set; }
+        List<ProcessedObject> detectedObjects;
         [Header("Object Tracking")]
         public float distanceThresholdForMerge = 300;
 
@@ -96,6 +96,14 @@ namespace HKY
             }
             if (o == null) Debug.LogWarning("cannot find object with guid " + guid);
             return o;
+        }
+
+        public List<ProcessedObject> GetObjects(float ageFilter = 0.5f)
+        {
+            var o = from obj in detectedObjects
+                    where obj.age > ageFilter
+                    select obj;
+            return o.ToList();
         }
 
         void CalculateDistanceConstrainList(int steps)

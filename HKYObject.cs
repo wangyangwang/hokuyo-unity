@@ -43,8 +43,15 @@ namespace HKY
 
         public readonly System.Guid guid;
         public Vector3 position { get; private set; }
+        public float age
+        {
+            get
+            {
+                return Time.time - birthTime;
+            }
+        }
         public float width;
-        // public float birthTime;
+        public float birthTime;
         public int missingFrame = 0;
         public bool clear { get; private set; }
 
@@ -60,8 +67,7 @@ namespace HKY
             this.width = width;
 
             currentVelocity = new Vector3();
-
-            // birthTime = Time.time;
+            birthTime = Time.time;
         }
 
         //update with a new position
