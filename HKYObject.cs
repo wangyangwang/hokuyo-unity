@@ -39,7 +39,8 @@ namespace HKY
     public class ProcessedObject
     {
 
-        static readonly int MISSING_FRAME_LIMIT = 10;
+        static readonly int MISSING_FRAME_LIMIT = 30;
+        public static float SMOOTH_TIME = 0.05f;
 
         public readonly System.Guid guid;
         public Vector3 position { get; private set; }
@@ -58,7 +59,7 @@ namespace HKY
         public bool useSmooth = true;
 
         Vector3 currentVelocity;
-        public float smoothTime = 0.1f;
+
 
         public ProcessedObject(Vector3 position, float width = 10)
         {
@@ -75,7 +76,7 @@ namespace HKY
         {
             if (useSmooth)
             {
-                position = Vector3.SmoothDamp(position, newPos, ref currentVelocity, smoothTime);
+                position = Vector3.SmoothDamp(position, newPos, ref currentVelocity, SMOOTH_TIME);
             }
             else
             {

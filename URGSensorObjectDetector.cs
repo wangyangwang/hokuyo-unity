@@ -58,8 +58,8 @@ namespace HKY
         public float distanceThresholdForMerge = 300;
 
         //Events
-        public static System.Action<Guid> OnNewObject;
-        public static System.Action<Guid> OnLoseObject;
+        public static System.Action<ProcessedObject> OnNewObject;
+        public static System.Action<ProcessedObject> OnLoseObject;
 
         [Header("Debug Draw")]
         public bool debugDrawDistance = false;
@@ -494,8 +494,8 @@ namespace HKY
                         var obj = detectedObjects[i];
                         if (obj.clear)
                         {
-                            if (OnLoseObject != null) { OnLoseObject(obj.guid); }
                             detectedObjects.RemoveAt(i);
+                            if (OnLoseObject != null) { OnLoseObject(obj); }
                         }
                     }
 
@@ -504,10 +504,7 @@ namespace HKY
                     {
                         var newbie = new ProcessedObject(leftOverNewObject.CalculatePosition());
                         detectedObjects.Add(newbie);
-                        if (OnNewObject != null)
-                        {
-                            OnNewObject(newbie.guid);
-                        }
+                        if (OnNewObject != null) { OnNewObject(newbie); }
                     }
                 }
                 else //add all raw objects into detectedObjects
@@ -516,10 +513,7 @@ namespace HKY
                     {
                         var newbie = new ProcessedObject(obj.CalculatePosition());
                         detectedObjects.Add(newbie);
-                        // if (OnNewObject != null)
-                        // {
-                        //     OnNewObject(newbie.guid);
-                        // }
+                        if (OnNewObject != null) { OnNewObject(newbie); }
                     }
                 }
             }
