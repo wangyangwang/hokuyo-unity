@@ -35,7 +35,7 @@ namespace HKY
         }
     }
 
-
+    [System.Serializable]
     public class ProcessedObject
     {
 
@@ -58,9 +58,9 @@ namespace HKY
         public bool useSmooth = true;
 
         Vector3 currentVelocity;
-        public float smoothTime = 0.3f;
+        public float smoothTime = 0.1f;
 
-        public ProcessedObject(Vector3 position, float width = 100)
+        public ProcessedObject(Vector3 position, float width = 10)
         {
             guid = System.Guid.NewGuid();
             this.position = position;

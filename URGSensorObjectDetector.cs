@@ -234,6 +234,7 @@ namespace HKY
                 {
                     Gizmos.color = processedObjectColor;
                     Gizmos.DrawCube(pObj.position, new Vector3(pObj.width, pObj.width, 1));
+                    UnityEditor.Handles.Label(pObj.position, pObj.position.ToString());
                 }
             }
 
