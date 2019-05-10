@@ -68,6 +68,7 @@ namespace HKY
         public bool drawObject = true;
         public bool drawProcessedObject = true;
         public bool drawRunningLine = true;
+        public bool showHardwareControlButtons = false;
         //colors
         public Color distanceColor = Color.white;
         public Color strengthColor = Color.red;
@@ -253,6 +254,7 @@ namespace HKY
 
         private void OnGUI()
         {
+            if (!showHardwareControlButtons) return;
             // https://sourceforge.net/p/urgnetwork/wiki/scip_jp/
             if (GUILayout.Button("VV: (Get Version Information)"))
             {
