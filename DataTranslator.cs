@@ -29,7 +29,7 @@ namespace HKY
         /// </summary>
         /// <param name="inputData">input point in sensor coordinate</param>
         /// <returns></returns>
-        public Vector2 Sensor2Screen(Vector2 inputData, ZeroPosition zeroPosition = ZeroPosition.LEFT_TOP)
+        public Vector2 Sensor2Screen(Vector2 inputData, ZeroPosition zeroPosition = ZeroPosition.LEFT_BOTTOM)
         {
             //apply offset in mm
             inputData.x += xOffset;
@@ -45,17 +45,35 @@ namespace HKY
             //convert to 0 to 1
             inputData.y /= sensorDetectHeight;
 
-            if (zeroPosition == ZeroPosition.LEFT_BOTTOM)
-            {
-                //flip the Y
-                inputData.y = 1 - inputData.y;
-            }
+           
 
             //now inputData's range is is x: 0->1  y: 0->1
             inputData.x *= Screen.width;
             inputData.y *= Screen.height;
 
+
+            if (zeroPosition == ZeroPosition.LEFT_BOTTOM)
+            {
+                inputData = inputData.FlipY();
+            }
+
+
             return inputData;
         }
+    }
+}
+
+public static class ExtensionMethods
+{
+    public static Vector2 FlipY(this Vector2 input)
+    {
+        input.y = Screen.height - input.y;
+        return input;
+    }
+
+    public static Vector3 FlipY(this Vector3 input)
+    {
+        input.y = Screen.height - input.y;
+        return input;
     }
 }
