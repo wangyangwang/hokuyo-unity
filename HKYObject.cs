@@ -43,7 +43,10 @@ namespace HKY
         public static float SMOOTH_TIME = 0.05f;
 
         public readonly System.Guid guid;
+
         public Vector3 position { get; private set; }
+        public Vector3 deltaMovement { get; private set; }
+
         public float age
         {
             get
@@ -59,7 +62,7 @@ namespace HKY
         public bool useSmooth = true;
 
         Vector3 currentVelocity;
-
+        Vector3 oldPosition;
 
         public ProcessedObject(Vector3 position, float width = 10)
         {
@@ -74,6 +77,8 @@ namespace HKY
         //update with a new position
         public void Update(Vector3 newPos)
         {
+            oldPosition = position;
+
             if (useSmooth)
             {
                 position = Vector3.SmoothDamp(position, newPos, ref currentVelocity, SMOOTH_TIME);
@@ -82,8 +87,10 @@ namespace HKY
             {
                 position = newPos;
             }
-
             missingFrame = 0;
+
+            deltaMovement = position - oldPosition;
+
         }
         //update without a new position
         public void Update()
