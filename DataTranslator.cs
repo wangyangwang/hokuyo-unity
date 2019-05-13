@@ -29,7 +29,7 @@ namespace HKY
         /// </summary>
         /// <param name="inputData">input point in sensor coordinate</param>
         /// <returns></returns>
-        public Vector2 Sensor2Screen(Vector2 inputData, ZeroPosition zeroPosition = ZeroPosition.LEFT_BOTTOM)
+        public Vector2 Sensor2Screen(Vector2 inputData, ZeroPosition zeroPosition = ZeroPosition.LEFT_TOP)
         {
             //apply offset in mm
             inputData.x += xOffset;
