@@ -193,8 +193,15 @@ namespace HKY
         private void OnDrawGizmos()
         {
             //draw boundary
-            Gizmos.DrawWireSphere(new Vector3(0, 0, 0) + transform.position, maxDetectionDist);
-            Gizmos.DrawWireCube(new Vector3(0, detectRectHeight / 2, 0) + transform.position, new Vector3(detectAreaRect.width, detectAreaRect.height, 1));
+            switch (distanceCroppingMethod)
+            {
+                case DistanceCroppingMethod.RADIUS:
+                    Gizmos.DrawWireSphere(new Vector3(0, 0, 0) + transform.position, maxDetectionDist);
+                    break;
+                case DistanceCroppingMethod.RECT:
+                    Gizmos.DrawWireCube(new Vector3(0, detectRectHeight / 2, 0) + transform.position, new Vector3(detectAreaRect.width, detectAreaRect.height, 1));
+                    break;
+            }
 
             //draw distance rays
             if (debugDrawDistance && croppedDistances != null)
