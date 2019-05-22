@@ -241,7 +241,7 @@ namespace HKY
                 foreach (var pObj in detectedObjects)
                 {
                     Gizmos.color = processedObjectColor;
-                    Gizmos.DrawCube(pObj.position, new Vector3(pObj.width, pObj.width, 1));
+                    Gizmos.DrawCube(pObj.position, new Vector3(pObj.size, pObj.size, 1));
                     UnityEditor.Handles.Label(pObj.position, pObj.position.ToString());
                 }
             }
@@ -484,7 +484,7 @@ namespace HKY
                             var closest = objectByDistance.Aggregate((l, r) => l.Value < r.Value ? l : r);
                             if (closest.Value <= distanceThresholdForMerge)
                             {
-                                oldObj.Update(closest.Key.CalculatePosition());
+                                oldObj.Update(closest.Key.CalculatePosition(), closest.Key.size);
                                 //remove the newObj that is being used
                                 newObjects.Remove(closest.Key);
                             }
@@ -511,7 +511,7 @@ namespace HKY
                     //create new object for those newobject that cannot find match from the old objects
                     foreach (var leftOverNewObject in newObjects)
                     {
-                        var newbie = new ProcessedObject(leftOverNewObject.CalculatePosition());
+                        var newbie = new ProcessedObject(leftOverNewObject.CalculatePosition(), leftOverNewObject.size);
                         detectedObjects.Add(newbie);
                         if (OnNewObject != null) { OnNewObject(newbie); }
                     }
@@ -520,7 +520,7 @@ namespace HKY
                 {
                     foreach (var obj in rawObjectList)
                     {
-                        var newbie = new ProcessedObject(obj.CalculatePosition());
+                        var newbie = new ProcessedObject(obj.CalculatePosition(), obj.size);
                         detectedObjects.Add(newbie);
                         if (OnNewObject != null) { OnNewObject(newbie); }
                     }

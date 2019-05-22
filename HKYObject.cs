@@ -11,6 +11,15 @@ namespace HKY
         public int averageId { get { return (int)(idList.Average()); } }
         public double averageDist { get { return distList.Average(); } }
         public long medianDist { get { return distList[distList.Count / 2]; } }
+        public float size
+        {
+            get
+            {
+                Vector2 pointA = CalculatePosition(cachedDirs[idList[0]], distList[0]);
+                Vector2 pointB = CalculatePosition(cachedDirs[idList[idList.Count - 1]], distList[distList.Count - 1]);
+                return Vector2.Distance(pointA, pointB);
+            }
+        }
 
         public List<long> distList;
         public List<int> idList;
@@ -19,10 +28,15 @@ namespace HKY
 
         public Vector2 CalculatePosition()
         {
-            float angle = Vector3.Angle(cachedDirs[medianId], Vector3.right);
+            return CalculatePosition(cachedDirs[medianId], medianDist);
+        }
+
+        Vector2 CalculatePosition(Vector3 dir, float dist)
+        {
+            float angle = Vector3.Angle(dir, Vector3.right);
             float theta = angle * Mathf.Deg2Rad;
-            float x = Mathf.Cos(theta) * (float)medianDist;
-            float y = Mathf.Sin(theta) * (float)medianDist;
+            float x = Mathf.Cos(theta) * dist;
+            float y = Mathf.Sin(theta) * dist;
             return new Vector2(x, y);
         }
 
@@ -54,7 +68,7 @@ namespace HKY
                 return Time.time - birthTime;
             }
         }
-        public float width;
+        public float size;
         public float birthTime;
         public int missingFrame = 0;
         public bool clear { get; private set; }
@@ -64,19 +78,20 @@ namespace HKY
         Vector3 currentVelocity;
         Vector3 oldPosition;
 
-        public ProcessedObject(Vector3 position, float width = 10)
+        public ProcessedObject(Vector3 position, float size)
         {
             guid = System.Guid.NewGuid();
             this.position = position;
-            this.width = width;
+            this.size = size;
 
             currentVelocity = new Vector3();
             birthTime = Time.time;
         }
 
         //update with a new position
-        public void Update(Vector3 newPos)
+        public void Update(Vector3 newPos, float newSize)
         {
+            size = newSize;
             oldPosition = position;
 
             if (useSmooth)
