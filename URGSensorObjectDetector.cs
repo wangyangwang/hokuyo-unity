@@ -56,6 +56,7 @@ namespace HKY
         List<ProcessedObject> detectedObjects;
         [Header("Object Tracking")]
         public float distanceThresholdForMerge = 300;
+        [Range(0.01f, 1f)] public float objectPositionSmoothTime = 0.2f;
 
         //Events
         public static System.Action<ProcessedObject> OnNewObject;
@@ -511,7 +512,7 @@ namespace HKY
                     //create new object for those newobject that cannot find match from the old objects
                     foreach (var leftOverNewObject in newObjects)
                     {
-                        var newbie = new ProcessedObject(leftOverNewObject.CalculatePosition(), leftOverNewObject.size);
+                        var newbie = new ProcessedObject(leftOverNewObject.CalculatePosition(), leftOverNewObject.size, objectPositionSmoothTime);
                         detectedObjects.Add(newbie);
                         if (OnNewObject != null) { OnNewObject(newbie); }
                     }
@@ -520,7 +521,7 @@ namespace HKY
                 {
                     foreach (var obj in rawObjectList)
                     {
-                        var newbie = new ProcessedObject(obj.CalculatePosition(), obj.size);
+                        var newbie = new ProcessedObject(obj.CalculatePosition(), obj.size, objectPositionSmoothTime);
                         detectedObjects.Add(newbie);
                         if (OnNewObject != null) { OnNewObject(newbie); }
                     }

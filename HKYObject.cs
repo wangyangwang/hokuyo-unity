@@ -52,37 +52,29 @@ namespace HKY
     [System.Serializable]
     public class ProcessedObject
     {
-
         static readonly int MISSING_FRAME_LIMIT = 30;
-        public static float SMOOTH_TIME = 0.05f;
-
         public readonly System.Guid guid;
-
         public Vector3 position { get; private set; }
         public Vector3 deltaMovement { get; private set; }
+        public float age { get { return Time.time - birthTime; } }
 
-        public float age
-        {
-            get
-            {
-                return Time.time - birthTime;
-            }
-        }
         public float size;
         public float birthTime;
         public int missingFrame = 0;
         public bool clear { get; private set; }
-
         public bool useSmooth = true;
 
         Vector3 currentVelocity;
         Vector3 oldPosition;
+        float posSmoothTime = 0.2f;
 
-        public ProcessedObject(Vector3 position, float size)
+        public ProcessedObject(Vector3 position, float size, float objectPositionSmoothTime = 0.2f)
         {
+
             guid = System.Guid.NewGuid();
             this.position = position;
             this.size = size;
+            posSmoothTime = objectPositionSmoothTime;
 
             currentVelocity = new Vector3();
             birthTime = Time.time;
@@ -96,7 +88,7 @@ namespace HKY
 
             if (useSmooth)
             {
-                position = Vector3.SmoothDamp(position, newPos, ref currentVelocity, SMOOTH_TIME);
+                position = Vector3.SmoothDamp(position, newPos, ref currentVelocity, posSmoothTime);
             }
             else
             {
