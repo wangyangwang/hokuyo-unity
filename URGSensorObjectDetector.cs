@@ -11,8 +11,8 @@ namespace HKY
     {
 
         [Header("Connection with Sensor")]
-        public string ip_address = "192.168.0.10";
-        public int port_number = 10940;
+        [SerializeField] string ip_address = "192.168.0.10";
+        [SerializeField] int port_number = 10940;
         UrgDeviceEthernet urg;
         public int sensorScanSteps { get; private set; }
         public bool open { get; private set; }
@@ -25,7 +25,7 @@ namespace HKY
         [Header("----------Rect based constrain")]
         public int detectRectWidth;     //Unit is MM
         public int detectRectHeight;    //Unit is MM
-        public Rect detectAreaRect
+        Rect detectAreaRect
         {
             get
             {
@@ -39,8 +39,8 @@ namespace HKY
         public long maxDetectionDist = 7000;//for radius based detection, unit is mm
 
         [Header("Post Processing Distance Data")]
-        public bool smoothDistanceCurve = false;
-        public bool smoothDistanceByTime = false;
+        [SerializeField] bool smoothDistanceCurve = false;
+        [SerializeField] bool smoothDistanceByTime = false;
         //if change between two consecutive frame is bigger than this number, then do not do smoothing
         [Range(1, 500)] public int timeSmoothBreakingDistanceChange = 200;
         [Range(1, 130)] public int smoothKernelSize = 21;
@@ -55,7 +55,7 @@ namespace HKY
         //Object Tracking
         List<ProcessedObject> detectedObjects;
         [Header("Object Tracking")]
-        public float distanceThresholdForMerge = 300;
+        [SerializeField] float distanceThresholdForMerge = 300;
         [Range(0.01f, 1f)] public float objectPositionSmoothTime = 0.2f;
 
         //Events
@@ -63,18 +63,18 @@ namespace HKY
         public static System.Action<ProcessedObject> OnLoseObject;
 
         [Header("Debug Draw")]
-        public bool debugDrawDistance = false;
-        public bool drawObjectRays = true;
-        public bool drawObjectCenterRay = true;
-        public bool drawObject = true;
-        public bool drawProcessedObject = true;
-        public bool drawRunningLine = true;
-        public bool showHardwareControlButtons = false;
+        [SerializeField] bool debugDrawDistance = false;
+        [SerializeField] bool drawObjectRays = true;
+        [SerializeField] bool drawObjectCenterRay = true;
+        [SerializeField] bool drawObject = true;
+        [SerializeField] bool drawProcessedObject = true;
+        [SerializeField] bool drawRunningLine = true;
+        [SerializeField] bool showHardwareControlButtons = false;
         //colors
-        public Color distanceColor = Color.white;
-        public Color strengthColor = Color.red;
-        public Color objectColor = Color.green;
-        public Color processedObjectColor = Color.cyan;
+        [SerializeField] Color distanceColor = Color.white;
+        [SerializeField] Color strengthColor = Color.red;
+        [SerializeField] Color objectColor = Color.green;
+        [SerializeField] Color processedObjectColor = Color.cyan;
 
         //General
         List<long> croppedDistances;
