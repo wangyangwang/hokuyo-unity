@@ -193,6 +193,7 @@ namespace HKY
         }
 
 #if UNITY_EDITOR
+        //todo: deal with offfset
         private void OnDrawGizmos()
         {
             //draw boundary

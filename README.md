@@ -1,5 +1,7 @@
 # hokuyo-unity
 
+...WORKING IN PROGRESS...
+
 this is modified based on https://github.com/inoook/UnityURG
 
 *code is still at a very primitive state, object detection can be improved*
