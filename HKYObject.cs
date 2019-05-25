@@ -80,6 +80,16 @@ namespace HKY
             birthTime = Time.time;
         }
 
+        public static ProcessedObject Clone(ProcessedObject obj)
+        {
+            Debug.Log(obj.guid.ToString() + " test before " + obj.position);
+            //  ProcessedObject newObj = new ProcessedObject(obj.position, obj.size, obj.posSmoothTime);
+            var s = JsonUtility.ToJson(obj);
+            var newObj = JsonUtility.FromJson<ProcessedObject>(s);
+            Debug.Log(obj.guid.ToString() + "test after" + newObj.position);
+            return newObj;
+        }
+
         //update with a new position
         public void Update(Vector3 newPos, float newSize)
         {
