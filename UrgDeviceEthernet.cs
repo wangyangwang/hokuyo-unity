@@ -41,8 +41,16 @@ public class UrgDeviceEthernet : UrgDevice
         try
         {
             tcpClient = new TcpClient();
-            tcpClient.Connect(ip_address, port_number);
+            var result = tcpClient.BeginConnect(ip_address, port_number, null, null);
+            var success = result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(1));
+            if (!success)
+            {
+                throw new Exception("Failed to connect.");
+            }
+            // we have connected
+            tcpClient.EndConnect(result);
 
+            // tcpClient.Connect(ip_address, port_number);
             Debug.Log("Connect setting = IP Address : " + ip_address + " Port number : " + port_number.ToString());
 
             //			this.listenThread = new Thread(new ThreadStart(ListenForClients));
@@ -59,6 +67,8 @@ public class UrgDeviceEthernet : UrgDevice
 
         }
     }
+
+    
 
     void OnDisable()
     {
