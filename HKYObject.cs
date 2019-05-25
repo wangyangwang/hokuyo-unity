@@ -26,7 +26,26 @@ namespace HKY
 
         private readonly Vector3[] cachedDirs;
 
-        public Vector2 CalculatePosition()
+        Vector2 _position = Vector2.zero;
+        //position will be set once to save computing power
+        bool positionSet = false;
+        public Vector2 position
+        {
+            get
+            {
+                if (!positionSet) Debug.LogError("position has not bee set yet");
+                return _position;
+            }
+            set { _position = value; }
+        }
+
+        public void GetPosition()
+        {
+            position = CalculatePosition();
+            positionSet = true;
+        }
+
+        Vector2 CalculatePosition()
         {
             return CalculatePosition(cachedDirs[medianId], medianDist);
         }
@@ -70,7 +89,6 @@ namespace HKY
 
         public ProcessedObject(Vector3 position, float size, float objectPositionSmoothTime = 0.2f)
         {
-
             guid = System.Guid.NewGuid();
             this.position = position;
             this.size = size;

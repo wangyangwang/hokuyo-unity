@@ -340,10 +340,7 @@ namespace HKY
         private void Update()
         {
 
-            if (smoothKernelSize % 2 == 0)
-            {
-                smoothKernelSize += 1;
-            }
+            if (smoothKernelSize % 2 == 0) { smoothKernelSize += 1; }
 
 
             List<long> originalDistances = new List<long>();
@@ -449,8 +446,10 @@ namespace HKY
                     }
                 }
             }
-
+            //remove the ones that might be noise
             resultList.RemoveAll(item => item.idList.Count < noiseLimit);
+            //all finished, calculate position and save it for later use
+            resultList.ForEach(i => { i.GetPosition(); });
             return resultList;
         }
 
