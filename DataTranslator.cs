@@ -9,7 +9,7 @@ namespace HKY
         public int xOffset;
         public int yOffset;
         public int sensorDetectWidth;
-        public int sensorDetectHeight;
+        public int sensorDetectHeight;        
 
         public enum ZeroPosition
         {
@@ -45,11 +45,9 @@ namespace HKY
             //convert to 0 to 1
             inputData.y /= sensorDetectHeight;
 
-           
-
             //now inputData's range is is x: 0->1  y: 0->1
-            inputData.x *= Screen.width;
-            inputData.y *= Screen.height;
+            inputData.x *= Camera.main.pixelWidth;
+            inputData.y *= Camera.main.pixelHeight;
 
 
             if (zeroPosition == ZeroPosition.LEFT_BOTTOM)
@@ -67,13 +65,13 @@ public static class ExtensionMethods
 {
     public static Vector2 FlipY(this Vector2 input)
     {
-        input.y = Screen.height - input.y;
+        input.y = Camera.main.pixelHeight - input.y;
         return input;
     }
 
     public static Vector3 FlipY(this Vector3 input)
     {
-        input.y = Screen.height - input.y;
+        input.y = Camera.main.pixelHeight - input.y;
         return input;
     }
 }
