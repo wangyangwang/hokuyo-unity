@@ -53,7 +53,7 @@ namespace HKY
         List<RawObject> rawObjectList;
 
 
-        List<ProcessedObject> detectedObjects;
+         [SerializeField] List<ProcessedObject> detectedObjects;
         [Header("Object Tracking")]
         [SerializeField] float distanceThresholdForMerge = 300;
         [Range(0.01f, 1f)] public float objectPositionSmoothTime = 0.2f;
@@ -72,6 +72,7 @@ namespace HKY
         [SerializeField] bool drawProcessedObject = true;
         [SerializeField] bool drawRunningLine = true;
         [SerializeField] bool showHardwareControlButtons = false;
+        [SerializeField] bool recalculateConstrainAreaEveryFrame = false;
         //colors
         [SerializeField] Color distanceColor = Color.white;
         [SerializeField] Color strengthColor = Color.red;
@@ -245,7 +246,8 @@ namespace HKY
                 foreach (var pObj in detectedObjects)
                 {
                     Gizmos.color = processedObjectColor;
-                    Gizmos.DrawCube(pObj.position, new Vector3(pObj.size, pObj.size, 1));
+                    float size = 30;// pObj.size;
+                    Gizmos.DrawCube(pObj.position, new Vector3(size, size, 1));
                     UnityEditor.Handles.Label(pObj.position, pObj.position.ToString());
                 }
             }
@@ -361,8 +363,16 @@ namespace HKY
                 sensorScanSteps = urg.distances.Count;
                 distanceConstrainList = new long[sensorScanSteps];
                 CacheDirections();
-
                 CalculateDistanceConstrainList(sensorScanSteps);
+
+            }
+
+            if (recalculateConstrainAreaEveryFrame)
+            {
+                if (Time.frameCount % 10 == 0)
+                {
+                    CalculateDistanceConstrainList(sensorScanSteps);
+                }
             }
 
             if (gd_loop)
