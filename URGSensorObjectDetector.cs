@@ -52,15 +52,17 @@ namespace HKY
         [Range(10, 1000)] public int deltaLimit = 200;
         List<RawObject> rawObjectList;
 
-        //Object Tracking
+
         List<ProcessedObject> detectedObjects;
         [Header("Object Tracking")]
         [SerializeField] float distanceThresholdForMerge = 300;
         [Range(0.01f, 1f)] public float objectPositionSmoothTime = 0.2f;
+        public Vector2 positionOffset;
+        public bool useOffset = true;
 
         //Events
         public static System.Action<ProcessedObject> OnNewObject;
-        public static System.Action<ProcessedObject> OnLoseObject;
+        public static System.Action<ProcessedObject> OnLostObject;
 
         [Header("Debug Draw")]
         [SerializeField] bool debugDrawDistance = false;
@@ -233,7 +235,7 @@ namespace HKY
                 //center
                 if (drawObjectCenterRay) Debug.DrawLine(Vector3.zero + transform.position, (dir * dist) + transform.position, Color.blue);
                 //draw objects!
-                if (drawObject) Gizmos.DrawWireCube((Vector3)obj.CalculatePosition() + transform.position, new Vector3(100, 100, 0));
+                if (drawObject) Gizmos.DrawWireCube((Vector3)obj.position + transform.position, new Vector3(100, 100, 0));
             }
 
             if (drawProcessedObject)
@@ -456,8 +458,19 @@ namespace HKY
 
         void UpdateObjectList()
         {
-            List<HKY.RawObject> newObjects = DetectObjects(croppedDistances, distanceConstrainList);
-            rawObjectList = new List<RawObject>(newObjects);
+            List<HKY.RawObject> newlyDetectedObjects = DetectObjects(croppedDistances, distanceConstrainList);
+            
+            //apply offset!===============
+            if (useOffset)
+            {
+                foreach (var obj in newlyDetectedObjects)
+                {
+                    obj.position += positionOffset;
+                }
+            }
+            //============================
+
+            rawObjectList = new List<RawObject>(newlyDetectedObjects);
 
             lock (detectedObjects)
             {
@@ -468,9 +481,9 @@ namespace HKY
                     {
                         Dictionary<RawObject, float> objectByDistance = new Dictionary<RawObject, float>();
                         //calculate all distance between existing objects and newly found objects
-                        foreach (var newObj in newObjects)
+                        foreach (var newObj in newlyDetectedObjects)
                         {
-                            float distance = Vector3.Distance(newObj.CalculatePosition(), oldObj.position);
+                            float distance = Vector3.Distance(newObj.position, oldObj.position);
                             objectByDistance.Add(newObj, distance);
                         }
 
@@ -484,9 +497,9 @@ namespace HKY
                             var closest = objectByDistance.Aggregate((l, r) => l.Value < r.Value ? l : r);
                             if (closest.Value <= distanceThresholdForMerge)
                             {
-                                oldObj.Update(closest.Key.CalculatePosition(), closest.Key.size);
+                                oldObj.Update(closest.Key.position, closest.Key.size);
                                 //remove the newObj that is being used
-                                newObjects.Remove(closest.Key);
+                                newlyDetectedObjects.Remove(closest.Key);
                             }
                             else
                             {
@@ -504,14 +517,14 @@ namespace HKY
                         if (obj.clear)
                         {
                             detectedObjects.RemoveAt(i);
-                            if (OnLoseObject != null) { OnLoseObject(obj); }
+                            if (OnLostObject != null) { OnLostObject(obj); }
                         }
                     }
 
                     //create new object for those newobject that cannot find match from the old objects
-                    foreach (var leftOverNewObject in newObjects)
+                    foreach (var leftOverNewObject in newlyDetectedObjects)
                     {
-                        var newbie = new ProcessedObject(leftOverNewObject.CalculatePosition(), leftOverNewObject.size, objectPositionSmoothTime);
+                        var newbie = new ProcessedObject(leftOverNewObject.position, leftOverNewObject.size, objectPositionSmoothTime);
                         detectedObjects.Add(newbie);
                         if (OnNewObject != null) { OnNewObject(newbie); }
                     }
@@ -520,7 +533,7 @@ namespace HKY
                 {
                     foreach (var obj in rawObjectList)
                     {
-                        var newbie = new ProcessedObject(obj.CalculatePosition(), obj.size, objectPositionSmoothTime);
+                        var newbie = new ProcessedObject(obj.position, obj.size, objectPositionSmoothTime);
                         detectedObjects.Add(newbie);
                         if (OnNewObject != null) { OnNewObject(newbie); }
                     }
