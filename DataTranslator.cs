@@ -9,7 +9,7 @@ namespace HKY
         public int xOffset;
         public int yOffset;
         public int sensorDetectWidth;
-        public int sensorDetectHeight;        
+        public int sensorDetectHeight;
 
         public enum ZeroPosition
         {
@@ -61,6 +61,7 @@ namespace HKY
     }
 }
 
+
 public static class ExtensionMethods
 {
     public static Vector2 FlipY(this Vector2 input)
@@ -73,5 +74,9 @@ public static class ExtensionMethods
     {
         input.y = Camera.main.pixelHeight - input.y;
         return input;
+    }
+    public static float Map(this float value, float fromSource, float toSource, float fromTarget, float toTarget)
+    {
+        return (value - fromSource) / (toSource - fromSource) * (toTarget - fromTarget) + fromTarget;
     }
 }
